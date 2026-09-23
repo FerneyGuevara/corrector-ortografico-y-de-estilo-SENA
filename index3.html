@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Experto Local - SENA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Personalización de la barra de desplazamiento para un aspecto más limpio */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
+
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- Ícono decorativo (representando el SENA/Educación) -->
+                <div class="bg-green-600 text-white p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">Editor Profesional Autónomo</h1>
+                    <p class="text-xs text-slate-500 font-medium tracking-wide">PROCESAMIENTO 100% LOCAL</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div id="setup-section" class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 max-w-2xl mx-auto text-center transition-all duration-500">
+            <div class="mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto text-blue-500 mb-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Inicializar Motor de Inteligencia Artificial</h2>
+                <p class="text-slate-600 mb-6">Para garantizar la privacidad, el modelo se descargará y ejecutará directamente en la memoria de este navegador. Este proceso tomará unos minutos la primera vez.</p>
+            </div>
+            
+            <button id="btn-load" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors w-full sm:w-auto">
+                Descargar e Inicializar Modelo
+            </button>
+            
+            <div id="progress-container" class="hidden mt-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <p class="text-sm text-slate-500 mb-2 font-semibold uppercase tracking-wider">Estado de carga:</p>
+                <p id="loading-status" class="text-sm font-mono text-blue-700 break-all">Preparando entorno...</p>
+            </div>
+        </div>
+
+        <div id="editor-section" class="hidden opacity-0 transition-opacity duration-1000">
+            
+            <!-- Mensaje de error (oculto por defecto) -->
+            <div id="error-message" class="hidden mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-md">
+                <p class="font-medium">Atención:</p>
+                <p id="error-text" class="text-sm"></p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Columna Izquierda: Entrada de texto -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[600px]">
+                    <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                        <label class="font-semibold text-slate-700 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-slate-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                            </svg>
+                            Texto Original
+                        </label>
+                        <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded">Editable</span>
+                    </div>
+                    <textarea id="user-text" class="w-full flex-grow p-4 focus:outline-none resize-none text-slate-700 leading-relaxed" placeholder="Pega o escribe aquí el texto que deseas revisar y mejorar..."></textarea>
+                    
+                    <div class="p-4 bg-slate-50 border-t border-slate-200">
+                        <button id="btn-analyze" class="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold py-3 px-4 rounded-lg shadow transition-colors w-full flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+                            </svg>
+                            Corregir y Mejorar Texto
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Salida de texto -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[600px]">
+                    <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                        <label class="font-semibold text-slate-700 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-green-600">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 0 1 9 9v.375M10.125 2.25A3.375 3.375 0 0 1 13.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 0 1 3.375 3.375M9 15l2.25 2.25L15 12" />
+                            </svg>
+                            Versión Mejorada
+                        </label>
+                        <button id="btn-copy" class="text-slate-500 hover:text-blue-600 transition-colors p-1" title="Copiar al portapapeles">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div id="result-box" class="w-full flex-grow p-4 bg-slate-50 overflow-y-auto whitespace-pre-wrap text-slate-800 leading-relaxed border-b border-transparent">
+                        <div class="h-full flex items-center justify-center text-slate-400 italic text-center">
+                            El resultado procesado aparecerá aquí una vez presiones el botón "Corregir y Mejorar Texto".
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { CreateMLCEngine } from "https://esm.run/@mlc.ai/web-llm";
+
+        // Referencias al DOM
+        const btnLoad = document.getElementById('btn-load');
+        const progressContainer = document.getElementById('progress-container');
+        const statusText = document.getElementById('loading-status');
+        
+        const setupSection = document.getElementById('setup-section');
+        const editorSection = document.getElementById('editor-section');
+        
+        const btnAnalyze = document.getElementById('btn-analyze');
+        const userText = document.getElementById('user-text');
+        const resultBox = document.getElementById('result-box');
+        const btnCopy = document.getElementById('btn-copy');
+        
+        const errorContainer = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+
+        let engine; 
+        
+        // El modelo solicitado, ideal por ser ligero y enfocado en instrucciones
+        const selectedModel = "Phi-3-mini-4k-instruct-q4f16_1-MLC"; 
+
+        btnLoad.addEventListener('click', async () => {
+            btnLoad.disabled = true;
+            btnLoad.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Iniciando descarga...
+            `;
+            btnLoad.classList.replace('bg-blue-600', 'bg-blue-400');
+            progressContainer.classList.remove('hidden');
+            
+            // Función para actualizar la barra de progreso en el UI
+            const initProgressCallback = (initProgress) => {
+                statusText.innerText = initProgress.text; 
+            };
+
+            try {
+                // Inicializamos el motor. Esto descarga los pesos del modelo a la caché del navegador.
+                engine = await CreateMLCEngine(selectedModel, { initProgressCallback: initProgressCallback });
+                
+                statusText.innerText = "¡Motor cargado exitosamente! Preparando editor...";
+                statusText.classList.replace('text-blue-700', 'text-green-600');
+                
+                // Transición suave hacia el editor
+                setTimeout(() => {
+                    setupSection.classList.add('hidden');
+                    editorSection.classList.remove('hidden');
+                    // Pequeño timeout para permitir que el display:block se aplique antes de animar opacidad
+                    setTimeout(() => {
+                        editorSection.classList.remove('opacity-0');
+                    }, 50);
+                }, 1000);
+
+            } catch (error) {
+                statusText.innerText = "Error crítico al cargar el modelo: " + error.message;
+                statusText.classList.replace('text-blue-700', 'text-red-600');
+                btnLoad.disabled = false;
+                btnLoad.innerText = "Reintentar carga";
+                btnLoad.classList.replace('bg-blue-400', 'bg-blue-600');
+            }
+        });
+
+        btnAnalyze.addEventListener('click', async () => {
+            const textToFix = userText.value.trim();
+            
+            // Validación para no usar alert()
+            if(!textToFix) {
+                errorText.innerText = "Por favor ingresa o pega un texto en el área original antes de corregir.";
+                errorContainer.classList.remove('hidden');
+                setTimeout(() => errorContainer.classList.add('hidden'), 4000);
+                return;
+            }
+
+            errorContainer.classList.add('hidden');
+            
+            // Estado de carga en el botón
+            const originalBtnText = btnAnalyze.innerHTML;
+            btnAnalyze.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Analizando texto...
+            `;
+            btnAnalyze.disabled = true;
+            btnAnalyze.classList.replace('bg-green-600', 'bg-green-400');
+            
+            // Mostrar estado de carga en la caja de resultados
+            resultBox.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center text-slate-500 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mb-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                    Aplicando reglas de ortografía, gramática, coherencia y estilo...
+                </div>`;
+
+            try {
+                // Prompt estricto basado en los requerimientos del usuario
+                const systemPrompt = `Actúa estrictamente como un editor profesional experto en lengua española, corrección de estilo y redacción. 
+
+REGLA FUNDAMENTAL: Mejora la forma del texto sin modificar el fondo. Mantén exactamente la intención, el significado, los hechos y la información original. NO inventes datos, nombres, fechas ni conclusiones. NO agregues información que no esté en el texto.
+
+Aplica exhaustivamente los siguientes criterios:
+1. ORTOGRAFÍA Y GRAMÁTICA: Corrige tildes, mayúsculas, signos de puntuación, concordancia (sujeto/verbo/género/número) y tiempos verbales.
+2. REDACCIÓN: Elimina redundancias, muletillas y palabras vacías. Sustituye expresiones confusas por naturales.
+3. COHERENCIA Y COHESIÓN: Verifica el sentido lógico, organiza ideas rotas, usa conectores adecuados y asegura la fluidez entre párrafos.
+4. ESTILO Y CONTEXTO: Conserva el propósito original. Usa un tono claro, profesional y fácil de leer.
+5. ESTRUCTURA: Reorganiza oraciones solo para mejorar la comprensión. Mantén títulos y listas.
+
+INSTRUCCIÓN CRÍTICA DE SALIDA:
+Entrega ÚNICA Y EXCLUSIVAMENTE el texto final mejorado. NO incluyas saludos (como "Aquí tienes"), NO expliques los cambios que hiciste, NO agregues comentarios, notas o introducciones. Solo devuelve el texto corregido puro.`;
+
+                const messages = [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: `Corrige este texto:\n\n${textToFix}` }
+                ];
+
+                // Ejecutamos la inferencia en el modelo local
+                const reply = await engine.chat.completions.create({ messages });
+                
+                // Formatear la salida manteniendo los saltos de línea (whitespace-pre-wrap en el CSS se encarga de mostrarlos)
+                resultBox.innerText = reply.choices[0].message.content.trim();
+
+            } catch (error) {
+                resultBox.innerHTML = `
+                    <div class="p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
+                        <strong>Ocurrió un error en el análisis:</strong> ${error.message}
+                    </div>`;
+                console.error(error);
+            } finally {
+                // Restaurar botón
+                btnAnalyze.innerHTML = originalBtnText;
+                btnAnalyze.disabled = false;
+                btnAnalyze.classList.replace('bg-green-400', 'bg-green-600');
+            }
+        });
+
+        btnCopy.addEventListener('click', () => {
+            const resultText = resultBox.innerText;
+            if (!resultText || resultBox.querySelector('.animate-pulse') || resultBox.querySelector('.text-slate-400')) {
+                // No hay texto válido para copiar
+                return;
+            }
+
+            // Usando execCommand como fallback seguro para iframes/ambientes sin acceso a clipboard API
+            const textArea = document.createElement("textarea");
+            textArea.value = resultText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                
+                // Feedback visual en el botón
+                const originalHTML = btnCopy.innerHTML;
+                btnCopy.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-green-600">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                `;
+                setTimeout(() => {
+                    btnCopy.innerHTML = originalHTML;
+                }, 2000);
+
+            } catch (err) {
+                console.error('Error al copiar: ', err);
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        });
+    </script>
+</body>
+</html>
